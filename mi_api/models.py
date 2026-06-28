@@ -1,5 +1,4 @@
 from django.db import models
-# Importaciones necesarias para que funcione como AUTH_USER_MODEL
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 
@@ -22,32 +21,31 @@ class UsuariosManager(BaseUserManager):
 
 
 class Usuarios(AbstractBaseUser, PermissionsMixin):
-    # Al usar primary_key=True, Django no creará el ID autoincremental para esta tabla
+    
     email = models.CharField(max_length=255, primary_key=True)
     username = models.CharField(max_length=255)
     
-    # NOTA: El campo 'password' ya lo incluye AbstractBaseUser de forma nativa y encriptada, 
-    # por lo que no es necesario declararlo aquí manualmente como antes.
+    #
     
     is_IT = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     
-    # Campos obligatorios internos que requiere Django Admin y la gestión de sesiones
-    is_staff = models.BooleanField(default=False)  # Permite acceso al panel de administración
-    is_active = models.BooleanField(default=True)  # Permite saber si el usuario está activo
+    
+    is_staff = models.BooleanField(default=False)  
+    is_active = models.BooleanField(default=True)  
 
-    # Configuración de los campos de autenticación obligatorios
-    USERNAME_FIELD = 'email'       # Indica que el inicio de sesión se hace con el correo
-    REQUIRED_FIELDS = ['username'] # Campos requeridos en la terminal al usar createsuperuser
+   
+    USERNAME_FIELD = 'email'       
+    REQUIRED_FIELDS = ['username'] 
 
-    objects = UsuariosManager()    # Enlaza el gestor personalizado de arriba
+    objects = UsuariosManager()   
 
     def __str__(self):
         return self.username
 
 
 class Zonas(models.Model):
-    # Django crea el campo 'id' (integer, primary key) automáticamente
+
     sucursal = models.CharField(max_length=255)
     sector = models.CharField(max_length=255)
 
@@ -69,7 +67,7 @@ class Tickets(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     descripcion = models.TextField()
     
-    # Llaves foráneas
+    
     id_cliente = models.ForeignKey(Usuarios, on_delete=models.CASCADE, related_name='tickets_cliente')
     id_tecnico = models.ForeignKey(Usuarios, on_delete=models.SET_NULL, null=True, blank=True, related_name='tickets_asignados')
     id_zona_problema = models.ForeignKey(Zonas, on_delete=models.CASCADE)

@@ -12,7 +12,7 @@ class TicketsAdmin(admin.ModelAdmin):
     list_filter = ('estado', 'id_zona_problema', 'id_falla')
     search_fields = ('nombre', 'descripcion')
 
-# Registro básico para los demás modelos
+
 admin.site.register(Zonas)
 admin.site.register(TipoFalla)
 admin.site.register(Adjunto)
