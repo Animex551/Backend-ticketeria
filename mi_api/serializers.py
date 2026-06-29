@@ -4,7 +4,11 @@ from .models import Usuarios, Zonas, TipoFalla, Tickets, Adjunto, BitacoraTicket
 class UsuariosSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuarios
-        fields = ['email', 'username', 'is_IT', 'is_admin'] # Excluimos password por seguridad en las respuestas
+        fields = ['email', 'username', 'password', 'is_IT', 'is_admin']
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def create(self, validated_data):
+        return Usuarios.objects.create_user(**validated_data)
 
 class ZonasSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,16 +21,23 @@ class TipoFallaSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class TicketSerializer(serializers.ModelSerializer):
-    # Esto te permite incluir opcionalmente los detalles anidados si React los necesita leer,
-    # o simplemente usar los IDs para crear/actualizar.
+    # Esto busca al usuario por email automáticamente al recibir el PATCH
+    id_tecnico = serializers.SlugRelatedField(
+        slug_field='email', 
+        queryset=Usuarios.objects.all(), 
+        required=False, 
+        allow_null=True
+    )
+
     class Meta:
         model = Tickets
         fields = '__all__'
 
 class AdjuntoSerializer(serializers.ModelSerializer):
+    path = serializers.FileField(required=True) 
     class Meta:
         model = Adjunto
-        fields = '__all__'
+        fields = ['id', 'path', 'id_tickets']
 
 class BitacoraTicketSerializer(serializers.ModelSerializer):
     class Meta:
